@@ -1,0 +1,23 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<h1>Order List for {{ request.user.username }}</h1>
+<table>
+    <tr>
+        <th>Order ID</th>
+        <th>Customer Name</th>
+        <th>Item</th>
+        <th>Status</th>
+        <th>Date Ordered</th>
+    </tr>
+    {% for order in orders %}
+    <tr>
+        <td>{{ order.id }}</td>
+        <td>{{ order.customer.username }}</td>
+        <td>{{ order.item.name }}</td>
+        <td>{{ order.status }}</td>
+        <td>{{ order.date_ordered }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

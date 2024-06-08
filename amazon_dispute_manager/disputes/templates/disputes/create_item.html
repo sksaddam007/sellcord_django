@@ -1,0 +1,11 @@
+<!-- templates/disputes/create_item.html -->
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>Add New Item</h1>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save</button>
+  </form>
+{% endblock %}

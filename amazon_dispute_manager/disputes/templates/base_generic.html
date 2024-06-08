@@ -1,0 +1,26 @@
+<!-- templates/base_generic.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}Amazon Dispute Manager{% endblock %}</title>
+    <script src="https://unpkg.com/htmx.org@1.6.1"></script>
+</head>
+<body>
+    <header>
+        <h1>Amazon Dispute Manager</h1>
+        <nav>
+            {% if user.is_authenticated %}
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit">Logout</button>
+                </form>
+            {% else %}
+                <a href="{% url 'login' %}">Login</a>
+            {% endif %}
+        </nav>
+    </header>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

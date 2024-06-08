@@ -1,0 +1,12 @@
+<!-- templates/disputes/create_dispute.html -->
+<div class="modal">
+  <div class="modal-content">
+    <span class="close" hx-get="{% url 'dispute_list' %}" hx-target="#dispute-list" hx-swap="innerHTML">×</span>
+    <h2>Create Dispute for Return {{ return_order.id }}</h2>
+    <form method="post" hx-post="{% url 'create_dispute' return_id=return_order.id %}" hx-target="#dispute-list" hx-swap="innerHTML">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+</div>

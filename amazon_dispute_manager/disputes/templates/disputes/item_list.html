@@ -1,0 +1,21 @@
+<!-- templates/disputes/item_list.html -->
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>Items List for {{ request.user.seller.name }}</h1>
+  <a href="{% url 'create_item' %}">Add New Item</a>
+  <table>
+    <tr>
+      <th>Name</th>
+      <th>Description</th>
+      <th>Price</th>
+    </tr>
+    {% for item in items %}
+    <tr>
+      <td>{{ item.name }}</td>
+      <td>{{ item.description }}</td>
+      <td>{{ item.price }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+{% endblock %}

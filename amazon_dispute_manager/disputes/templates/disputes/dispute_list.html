@@ -1,0 +1,25 @@
+<!-- templates/disputes/dispute_list.html -->
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>Dispute List for {{ request.user.seller.name }}</h1>
+  <div id="dispute-modal" hx-swap="innerHTML"></div>
+  <div id="dispute-list">
+    <table>
+      <tr>
+        <th>Dispute Reason</th>
+        <th>Status</th>
+        <th>Resolution Details</th>
+        <th>Date Created</th>
+      </tr>
+      {% for dispute in disputes %}
+      <tr>
+        <td>{{ dispute.dispute_reason }}</td>
+        <td>{{ dispute.status }}</td>
+        <td>{{ dispute.resolution_details }}</td>
+        <td>{{ dispute.date_created }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+{% endblock %}
