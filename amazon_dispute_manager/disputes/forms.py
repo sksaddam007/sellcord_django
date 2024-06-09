@@ -26,7 +26,7 @@ class ItemForm(forms.ModelForm):
 class OrderForm(forms.ModelForm):
     class Meta:
         model = Order
-        fields = ['customer', 'item', 'date_ordered']
+        fields = ['status', 'date_ordered']
 
 
 class ReturnForm(forms.ModelForm):

@@ -1,4 +1,5 @@
 # disputes/views.py
+import datetime
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
@@ -42,9 +43,12 @@ def custom_login(request):
 
 @login_required
 def item_list(request):
-    seller = get_object_or_404(Seller, user=request.user)
-    items = Item.objects.filter(seller=seller)
-    return render(request, 'disputes/item_list.html', {'items': items})
+    if request.user.role == 'seller':
+        seller = get_object_or_404(Seller, user=request.user)
+        items = Item.objects.filter(seller=seller)
+    if request.user.role == 'customer':
+        items = Item.objects.all()
+    return render(request, 'disputes/item_list.html', {'items': items, 'request': request})
 
 
 @login_required
@@ -88,6 +92,42 @@ def create_dispute(request, return_id):
 
 
 @login_required
+def edit_dispute(request, dispute_id):
+    dispute = get_object_or_404(Dispute, id=dispute_id)
+    seller = get_object_or_404(Seller, user=request.user)
+
+    # Ensure the dispute belongs to a return order of the seller
+    if dispute.return_order.order.item.seller != seller:
+        return redirect('dispute_list')
+
+    if request.method == 'POST':
+        form = DisputeForm(request.POST, instance=dispute)
+        if form.is_valid():
+            form.save()
+            return redirect('dispute_list')
+    else:
+        form = DisputeForm(instance=dispute)
+
+    return render(request, 'disputes/edit_dispute.html', {'form': form, 'dispute': dispute})
+
+
+@login_required
+def delete_dispute(request, dispute_id):
+    dispute = get_object_or_404(Dispute, id=dispute_id)
+    seller = get_object_or_404(Seller, user=request.user)
+
+    # Ensure the dispute belongs to a return order of the seller
+    if dispute.return_order.order.item.seller != seller:
+        return redirect('dispute_list')
+
+    if request.method == 'POST':
+        dispute.delete()
+        return redirect('dispute_list')
+
+    return render(request, 'disputes/delete_dispute.html', {'dispute': dispute})
+
+
+@login_required
 def create_item(request):
     seller = get_object_or_404(Seller, user=request.user)
     if request.method == 'POST':
@@ -103,17 +143,47 @@ def create_item(request):
 
 
 @login_required
-def create_order(request):
-    if request.user.role != 'customer':
-        return redirect('home')
+def edit_item(request, item_id):
+    item = get_object_or_404(Item, id=item_id)
 
     if request.method == 'POST':
-        form = OrderForm(request.POST)
+        form = ItemForm(request.POST, instance=item)
         if form.is_valid():
-            order = form.save(commit=False)
-            order.customer = request.user
-            order.save()
-            return redirect('order_list')
+            form.save()
+            return redirect('item_list')
+    else:
+        form = ItemForm(instance=item)
+    return render(request, 'disputes/edit_item.html', {'form': form, 'item': item})
+
+
+@login_required
+def create_order(request, item_id):
+    if request.user.role != 'customer':
+        return redirect('item_list')
+
+    item = get_object_or_404(Item, id=item_id)
+    if request.method == 'POST':
+        order = Order()
+        order.customer = request.user
+        order.item = item
+        order.date_ordered = datetime.datetime.now()
+        order.save()
+        return redirect('item_list')
     else:
         form = OrderForm()
-    return render(request, 'disputes/create_order.html', {'form': form})
+        form.customer = request.user.customer
+    return render(request, 'disputes/create_order.html', {'form': form, 'item': item})
+
+
+@login_required
+def edit_order(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+
+    if request.method == 'POST':
+        form = OrderForm(request.POST, instance=order)
+        if form.is_valid():
+            form.save()
+            return redirect('order_list')
+    else:
+        form = OrderForm(instance=order)
+    return render(request, 'disputes/edit_order.html', {'form': form, 'order': order})

@@ -4,6 +4,21 @@
 <head>
     <title>{% block title %}Amazon Dispute Manager{% endblock %}</title>
     <script src="https://unpkg.com/htmx.org@1.6.1"></script>
+    <style>
+        body {
+            display: flex;
+        }
+        header, nav, main {
+            margin: 10px;
+            padding: 10px;
+        }
+        header, nav {
+            flex: 1;
+        }
+        main {
+            flex: 3;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -19,6 +34,25 @@
             {% endif %}
         </nav>
     </header>
+
+    {% if user.is_authenticated %}
+    <nav>
+        <ul>
+            {% if user.role == 'seller' %}
+                <li><a href="{% url 'dispute_list' %}">Disputes</a></li>
+                <li><a href="{% url 'return_list' %}">Returns</a></li>
+                <li><a href="{% url 'item_list' %}">Available Items</a></li>
+
+                <!-- Add more seller-specific links as needed -->
+            {% elif user.role == 'customer' %}
+                <li><a href="{% url 'order_list' %}">Orders</a></li>
+                <li><a href="{% url 'item_list' %}">Available Items</a></li>
+                <!-- Add more customer-specific links as needed -->
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+
     <main>
         {% block content %}{% endblock %}
     </main>

@@ -3,18 +3,40 @@
 
 {% block content %}
   <h1>Items List for {{ request.user.seller.name }}</h1>
-  <a href="{% url 'create_item' %}">Add New Item</a>
+
+  <!-- Show "Add New Item" button only if the user is a seller -->
+  {% if request.user.role == 'seller' %}
+    <a href="{% url 'create_item' %}">Add New Item</a>
+  {% endif %}
+
   <table>
     <tr>
       <th>Name</th>
       <th>Description</th>
       <th>Price</th>
+      <!-- Add column for action buttons -->
+      <th>Actions</th>
     </tr>
     {% for item in items %}
     <tr>
       <td>{{ item.name }}</td>
       <td>{{ item.description }}</td>
       <td>{{ item.price }}</td>
+      <td>
+        <!-- Show "Create Order" button only if the user is a customer -->
+        {% if request.user.role == 'customer' %}
+          <form method="post" action="{% url 'create_order' item.id %}">
+            {% csrf_token %}
+            <button type="submit">Create Order</button>
+          </form>
+        {% endif %}
+        {% if request.user.role == 'seller' %}
+          <form method="post" action="{% url 'edit_item' item.id %}">
+            {% csrf_token %}
+            <button type="submit">Edit</button>
+          </form>
+        {% endif %}
+      </td>
     </tr>
     {% endfor %}
   </table>

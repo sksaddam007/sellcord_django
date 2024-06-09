@@ -1,3 +1,4 @@
+<!-- templates/orders/order_list.html -->
 {% extends "base_generic.html" %}
 
 {% block content %}
@@ -9,6 +10,9 @@
         <th>Item</th>
         <th>Status</th>
         <th>Date Ordered</th>
+        {% if request.user.role == 'seller' %}
+        <th>Actions</th>
+        {% endif %}
     </tr>
     {% for order in orders %}
     <tr>
@@ -17,6 +21,11 @@
         <td>{{ order.item.name }}</td>
         <td>{{ order.status }}</td>
         <td>{{ order.date_ordered }}</td>
+        {% if request.user.role == 'seller' %}
+        <td>
+            <a href="{% url 'edit_order' order.id %}">Edit</a>
+        </td>
+        {% endif %}
     </tr>
     {% endfor %}
 </table>

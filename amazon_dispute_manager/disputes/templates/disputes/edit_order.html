@@ -1,0 +1,12 @@
+<!-- templates/orders/edit_order.html -->
+{% extends "base_generic.html" %}
+
+{% block content %}
+<h1>Edit Order {{ order.id }}</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save changes</button>
+</form>
+<a href="{% url 'order_list' %}">Cancel</a>
+{% endblock %}

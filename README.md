@@ -32,4 +32,4 @@
 - Returns
   * Seller can raise/create a dispute per return
 - Disputes
-  * Seller can see the disputes
+  * Seller can see the disputes edit and delete
