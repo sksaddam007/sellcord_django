@@ -1,0 +1,24 @@
+{% extends 'layouts/b.html' %}
+
+<h1>Dispute {{ request.user.username }}</h1>
+
+<table>
+    <tr>
+        <th>Dispute Reason</th>
+        <th>Status</th>
+        <th>Resolution Details</th>
+        <th>Date Created</th>
+        <th>Actions</th>
+    </tr>
+    <tr>
+        <td>{{ dispute.dispute_reason }}</td>
+        <td>{{ dispute.status }}</td>
+        <td>{{ dispute.resolution_details }}</td>
+        <td>{{ dispute.date_created }}</td>
+        <td>
+            <a href="{% url 'edit_dispute' dispute.id %}">Edit</a>
+            <a href="{% url 'delete_dispute' dispute.id %}">Delete</a>
+        </td>
+    </tr>
+</table>
+{% endblock %}

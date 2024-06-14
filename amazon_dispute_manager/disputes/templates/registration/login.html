@@ -1,9 +1,37 @@
+{% extends 'layouts/b.html' %}
 {% block content %}
+{% load widget_tweaks %}
+
 <h2>Login</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Login</button>
-    <a class="btn btn-primary" href="{% url 'register' %}">Sign Up</a>
-</form>
+
+<div class="wrapper fadeInDown">
+  <div id="formContent">
+    <form method="post">
+      {% csrf_token %}
+
+      <div class="form-group fadeIn second">
+        {{ form.username.label_tag }}
+        {{ form.username|add_class:"form-control" }}
+        {% if form.username.errors %}
+        <div class="invalid-feedback">
+          {{ form.username.errors }}
+        </div>
+        {% endif %}
+      </div>
+
+
+      <div class="form-group fadeIn third">
+        {{ form.password.label_tag }}
+        {{ form.password|add_class:"form-control" }}
+        {% if form.password.errors %}
+        <div class="invalid-feedback">
+          {{ form.password.errors }}
+        </div>
+        {% endif %}
+      </div>
+
+      <button type="submit" class="fadeIn fourth">Log In</button>
+    </form>
+  </div>
+</div>
 {% endblock %}
