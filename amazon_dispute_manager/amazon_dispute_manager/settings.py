@@ -36,7 +36,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'widget_tweaks'
+    'widget_tweaks',
+    'django_extensions'
 ]
 
 MIDDLEWARE = [
@@ -135,3 +136,7 @@ AUTH_USER_MODEL = 'disputes.CustomUser'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap5'
 
+GRAPH_MODELS = {
+    'all_applications': True,
+    'group_models': True
+}
