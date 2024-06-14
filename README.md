@@ -36,4 +36,4 @@
 
 ### Below is the db schema
 
-![image db_erd](erd.png)
+![image db_erd](amazon_dispute_manager/erd.png)
