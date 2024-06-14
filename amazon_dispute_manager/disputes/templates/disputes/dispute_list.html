@@ -1,28 +1,32 @@
-{% extends "base_generic.html" %}
+{% extends 'layouts/b.html' %}
 
 {% block content %}
 <h1>Dispute List for {{ request.user.username }}</h1>
-<div id="dispute-list">
+<div id="dispute-list" hx-get="/disputes">
     <table>
-        <tr>
-            <th>Dispute Reason</th>
-            <th>Status</th>
-            <th>Resolution Details</th>
-            <th>Date Created</th>
-            <th>Actions</th>
-        </tr>
-        {% for dispute in disputes %}
-        <tr>
-            <td>{{ dispute.dispute_reason }}</td>
-            <td>{{ dispute.status }}</td>
-            <td>{{ dispute.resolution_details }}</td>
-            <td>{{ dispute.date_created }}</td>
-            <td>
-                <a href="{% url 'edit_dispute' dispute.id %}">Edit</a>
-                <a href="{% url 'delete_dispute' dispute.id %}">Delete</a>
-            </td>
-        </tr>
-        {% endfor %}
+        <thead>
+            <tr>
+                <th>Dispute Reason</th>
+                <th>Status</th>
+                <th>Resolution Details</th>
+                <th>Date Created</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dispute in disputes %}
+            <tr hx-swap="innerHTML">
+                <td>{{ dispute.dispute_reason }}</td>
+                <td>{{ dispute.status }}</td>
+                <td>{{ dispute.resolution_details }}</td>
+                <td>{{ dispute.date_created }}</td>
+                <td>
+                    <a href="{% url 'edit_dispute' dispute.id %}">Edit</a>
+                    <a href="#" hx-delete="/disputes/{{ dispute.id }}" hx-confirm="Are you sure you want to delete this dispute?">Delete</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
     </table>
 </div>
 {% endblock %}

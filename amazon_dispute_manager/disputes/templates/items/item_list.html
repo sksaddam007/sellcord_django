@@ -1,0 +1,40 @@
+{% extends 'layouts/b.html' %}
+
+{% block content %}
+  <h1>Items List for {{ request.user.seller.name }}</h1>
+
+  {% if request.user.role == 'seller' %}
+    <button type="submit" class="btn btn-primary float-right" formaction="{% url 'create_item' %}">Add New Item</button>
+  {% endif %}
+
+  <table hx-get="/items/" class="table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Price</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+      <tr hx-swap="beforeend" hx-target="closest .table">
+        <td>{{ item.name }}</td>
+        <td>{{ item.description }}</td>
+        <td>{{ item.price }}</td>
+        <td>
+          {% if request.user.role == 'customer' %}
+            <form method="post" action="{% url 'create_order' item.id %}">
+              {% csrf_token %}
+              <button type="submit">Create Order</button>
+            </form>
+          {% endif %}
+          {% if request.user.role == 'seller' %}
+            <a href="{% url 'edit_item' item.id %}" hx-get="/items/{{ item.id }}">Edit</a>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

@@ -1,0 +1,42 @@
+<!-- templates/orders/order_list.html -->
+{% extends 'layouts/b.html' %}
+
+{% block content %}
+<h1>Order List for {{ request.user.username }}</h1>
+<table hx-get="/order/" >
+    <thead>
+    <tr>
+        <th>Order ID</th>
+        <th>Customer Name</th>
+        <th>Item</th>
+        <th>Status</th>
+        <th>Date Ordered</th>
+        <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for order in orders %}
+    <tr hx-swap="beforeend" hx-target="closest .table">
+        <td>{{ order.id }}</td>
+        <td>{{ order.customer.username }}</td>
+        <td>{{ order.item.name }}</td>
+        <td>{{ order.status }}</td>
+        <td>{{ order.date_ordered }}</td>
+        {% if request.user.role == 'seller' %}
+            <td>
+                <a href="{% url 'edit_order' order.id %}">Edit</a>
+            </td>
+        {% endif %}
+        {% if request.user.role == 'customer' and order.status != 'Returned' %}
+            <td>
+                <form method="post" action="{% url 'create_return' order.id %}">
+                    {% csrf_token %}
+                    <button class="btn btn-primary btn-block" type="submit">Cancel/Return</button>
+                </form>
+            </td>
+          {% endif %}
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

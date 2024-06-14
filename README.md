@@ -33,3 +33,7 @@
   * Seller can raise/create a dispute per return
 - Disputes
   * Seller can see the disputes edit and delete
+
+### Below is the db schema
+
+![image db_erd](erd.png)

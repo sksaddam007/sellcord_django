@@ -48,7 +48,7 @@ def item_list(request):
         items = Item.objects.filter(seller=seller)
     if request.user.role == 'customer':
         items = Item.objects.all()
-    return render(request, 'disputes/item_list.html', {'items': items, 'request': request})
+    return render(request, 'items/item_list.html', {'items': items, 'request': request})
 
 
 @login_required
@@ -58,14 +58,14 @@ def order_list(request):
         orders = Order.objects.filter(item__seller=seller)
     if request.user.role == 'customer':
         orders = Order.objects.filter(customer=request.user)
-    return render(request, 'disputes/order_list.html', {'orders': orders})
+    return render(request, 'orders/order_list.html', {'orders': orders})
 
 
 @login_required
 def return_list(request):
     seller = get_object_or_404(Seller, user=request.user)
     returns = Return.objects.filter(order__item__seller=seller)
-    return render(request, 'disputes/return_list.html', {'returns': returns})
+    return render(request, 'returns/return_list.html', {'returns': returns})
 
 
 @login_required
@@ -73,6 +73,19 @@ def dispute_list(request):
     seller = get_object_or_404(Seller, user=request.user)
     disputes = Dispute.objects.filter(return_order__order__item__seller=seller)
     return render(request, 'disputes/dispute_list.html', {'disputes': disputes})
+
+
+@login_required
+def dispute_view(request, dispute_id):
+    dispute = get_object_or_404(Dispute, id=dispute_id)
+    seller = get_object_or_404(Seller, user=request.user)
+    if dispute.return_order.order.item.seller != seller:
+        return redirect('dispute_list')
+
+    if request.method == 'DELETE':
+        dispute.delete()
+        return HttpResponse(status=204)
+    return render(request, 'disputes/view_dispute.html', {'dispute': dispute, 'request': request})
 
 
 @login_required
@@ -120,7 +133,7 @@ def delete_dispute(request, dispute_id):
     if dispute.return_order.order.item.seller != seller:
         return redirect('dispute_list')
 
-    if request.method == 'POST':
+    if request.method == 'DELETE':
         dispute.delete()
         return redirect('dispute_list')
 
@@ -139,7 +152,7 @@ def create_item(request):
             return redirect('item_list')
     else:
         form = ItemForm()
-    return render(request, 'disputes/create_item.html', {'form': form})
+    return render(request, 'items/create_item.html', {'form': form})
 
 
 @login_required
@@ -153,7 +166,7 @@ def edit_item(request, item_id):
             return redirect('item_list')
     else:
         form = ItemForm(instance=item)
-    return render(request, 'disputes/edit_item.html', {'form': form, 'item': item})
+    return render(request, 'items/edit_item.html', {'form': form, 'item': item})
 
 
 @login_required
@@ -172,7 +185,29 @@ def create_order(request, item_id):
     else:
         form = OrderForm()
         form.customer = request.user.customer
-    return render(request, 'disputes/create_order.html', {'form': form, 'item': item})
+    return render(request, 'orders/create_order.html', {'form': form, 'item': item})
+
+
+@login_required
+def create_return(request, order_id):
+    if request.user.role != 'customer':
+        return redirect('item_list')
+
+    order = get_object_or_404(Order, id=order_id)
+    if request.method == 'POST':
+        return_order = Return()
+        return_order.order = order
+        return_order.return_reason = "test return"
+        return_order.return_tracking = "pending"
+        return_order.date_returned = datetime.datetime.now()
+        return_order.save()
+        order.status = 'Returned'
+        order.save()
+        return redirect('order_list')
+    else:
+        form = ReturnForm()
+        form.order = order
+    return render(request, 'returns/create_return.html', {'form': form, 'return': order})
 
 
 @login_required
@@ -186,4 +221,67 @@ def edit_order(request, order_id):
             return redirect('order_list')
     else:
         form = OrderForm(instance=order)
-    return render(request, 'disputes/edit_order.html', {'form': form, 'order': order})
+    return render(request, ' orders/edit_order.html', {'form': form, 'order': order})
+
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_required
+from django.urls import reverse
+from django.contrib import messages
+from django.http import Http404, HttpResponse
+from .forms import *
+
+
+def profile_view(request, username=None):
+    if username:
+        profile = get_object_or_404(CustomUser, username=username).profile
+    else:
+        try:
+            profile = request.user.profile
+        except:
+            raise Http404()
+
+    posts = profile.user.posts.all()
+
+    context = {
+        'profile': profile,
+        'posts': posts,
+    }
+
+    return render(request, 'a_users/profile.html', context)
+
+
+@login_required
+def profile_edit_view(request):
+    form = ProfileForm(instance=request.user.profile)
+
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, request.FILES, instance=request.user.profile)
+        if form.is_valid():
+            form.save()
+
+            if request.user.emailaddress_set.get(primary=True).verified:
+                return redirect('profile')
+            else:
+                return redirect('profile-verify-email')
+
+    if request.path == reverse('profile-onboarding'):
+        template = 'a_users/profile_onboarding.html'
+    else:
+        template = 'a_users/profile_edit.html'
+
+    return render(request, template, {'form': form})
+
+
+@login_required
+def profile_delete_view(request):
+    user = request.user
+
+    if request.method == 'POST':
+        logout(request)
+        user.delete()
+        messages.success(request, 'Account deleted, what a pity')
+        return redirect('home')
+
+    return render(request, 'a_users/profile_delete.html')
