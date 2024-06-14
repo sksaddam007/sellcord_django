@@ -2,7 +2,7 @@
 
 {% block content %}
 <h1>Dispute List for {{ request.user.username }}</h1>
-<div id="dispute-list" hx-get="/disputes">
+<div id="dispute-list" hx-get="/disputes" hx-trigger="every 5s">
     <table>
         <thead>
             <tr>
@@ -13,9 +13,9 @@
                 <th>Actions</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody >
             {% for dispute in disputes %}
-            <tr hx-swap="innerHTML">
+            <tr>
                 <td>{{ dispute.dispute_reason }}</td>
                 <td>{{ dispute.status }}</td>
                 <td>{{ dispute.resolution_details }}</td>

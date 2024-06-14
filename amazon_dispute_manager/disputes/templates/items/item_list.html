@@ -4,7 +4,7 @@
   <h1>Items List for {{ request.user.seller.name }}</h1>
 
   {% if request.user.role == 'seller' %}
-    <button type="submit" class="btn btn-primary float-right" formaction="{% url 'create_item' %}">Add New Item</button>
+    <a href="{% url 'create_item' %}">Add New Item</a>
   {% endif %}
 
   <table hx-get="/items/" class="table">
